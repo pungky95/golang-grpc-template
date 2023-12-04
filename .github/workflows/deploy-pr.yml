@@ -1,0 +1,73 @@
+name: Build and Deploy to Cloud Run on PR
+
+on:
+  pull_request:
+    types: [labeled]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GAR_LOCATION: asia-northeast1
+  GAR_REPOSITORY: golang-grpc-artifact-registry
+  SERVICE: golang-grpc-${{ github.event.number }}
+  REGION: asia-southeast1
+  DB_HOST: ${{ secrets.DB_HOST_STAGING }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+  DB_DATABASE: ${{ secrets.DB_DATABASE }}
+  DB_USERNAME: ${{ secrets.DB_USERNAME_STAGING }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD_STAGING }}
+  DB_CLUSTER: ${{ secrets.DB_CLUSTER }}
+  API_KEY: ${{ secrets.API_KEY }}
+  DEFAULT_USER_PASSWORD: ${{ secrets.DEFAULT_USER_PASSWORD }}
+
+jobs:
+  deploy:
+    if: github.event.label.name == 'pr review deploy'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: Docker Auth
+        id: docker-auth
+        uses: 'docker/login-action@v2'
+        with:
+          registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
+          username: '_json_key'
+          password: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: Build and Push Image to Artifact Registry
+        run: |-
+          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}" ./
+          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
+          env_vars: |
+            APP_ENV=staging
+            DB_HOST=${{ env.DB_HOST }}
+            DB_PORT=${{ env.DB_PORT }}
+            DB_DATABASE=${{ env.DB_DATABASE }}
+            DB_USERNAME=${{ env.DB_USERNAME }}
+            DB_PASSWORD=${{ env.DB_PASSWORD }}
+            DB_CLUSTER=${{ env.DB_CLUSTER }}
+            API_KEY=${{ env.API_KEY }}
+            DEFAULT_USER_PASSWORD=${{ env.DEFAULT_USER_PASSWORD }}
+          flags: '--allow-unauthenticated --use-http2'
+
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
