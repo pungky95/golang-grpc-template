@@ -1,4 +1,4 @@
-name: Code Review Bot Workflow
+name: Code Review Bot
 
 on:
   pull_request:
