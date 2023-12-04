@@ -69,10 +69,3 @@ jobs:
             API_KEY=${{ env.API_KEY }}
             DEFAULT_USER_PASSWORD=${{ env.DEFAULT_USER_PASSWORD }}
           flags: '--allow-unauthenticated --use-http2'
-
-      - name: Create or Update Comment
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🚀 The service has been deployed! Check it out ${{ steps.deploy.outputs.url }}
