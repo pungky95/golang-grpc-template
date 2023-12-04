@@ -1,0 +1,27 @@
+name: Code Review Bot
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+permissions: write-all
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_API_MODEL: "gpt-3.5-turbo-16k" # Optional: defaults to "gpt-4"
+      exclude: "**/*.json, **/*.md, go.mod, go.sum" # Optional: exclude patterns separated by commas
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: AI Code Reviewer
+        uses: pungky95/code-review-bot@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_MODEL: "gpt-3.5-turbo-16k"
+          exclude: "**/*.json, **/*.md"
