@@ -25,6 +25,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+      pull-requests: write
 
     runs-on: ubuntu-latest
     steps:
@@ -69,5 +70,9 @@ jobs:
             DEFAULT_USER_PASSWORD=${{ env.DEFAULT_USER_PASSWORD }}
           flags: '--allow-unauthenticated --use-http2'
 
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
+      - name: Create or Update Comment
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            The service has been deployed! Check it out [here](${{ steps.deploy.outputs.url }}).
