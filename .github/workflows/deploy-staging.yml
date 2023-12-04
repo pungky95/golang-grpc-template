@@ -9,8 +9,8 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GAR_LOCATION: asia-northeast1
   GAR_REPOSITORY: golang-grpc-artifact-registry
-  SERVICE: golang-grpc-${{ github.event.number }}
-  REGION: asia-southeast1
+  SERVICE: golang-grpc
+  REGION: asia-northeast1
   DB_HOST: ${{ secrets.DB_HOST_STAGING }}
   DB_PORT: ${{ secrets.DB_PORT }}
   DB_DATABASE: ${{ secrets.DB_DATABASE }}
