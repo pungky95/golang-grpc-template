@@ -75,4 +75,5 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            🚀 The service has been deployed! Check it out ${{ steps.deploy.outputs.url }}
+            🚀 The service has been deployed! Check it out ${{ steps.deploy.outputs.url }} 
+            (Note: since this service is gRPC service replace https:// with grpc:// and use gRPC client such as Postman to test it!)
