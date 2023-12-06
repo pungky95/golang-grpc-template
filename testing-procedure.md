@@ -12,7 +12,7 @@ Open Postman and create a new request.
 
 ## 4. Add Metadata
 - Click on the "Headers" tab.
-- Add a new header with the key `x-api-key` and the value ``.
+- Add a new header with the key `x-api-key` and the value `QbWwtX15K5EDp0gNvcxMRkzrC7f9Qxqn`.
 
 ## 5. Configure gRPC Settings
 - Fetch by `Use Server Reflection`
