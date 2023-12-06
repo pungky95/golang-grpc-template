@@ -77,3 +77,4 @@ jobs:
           body: |
             🚀 The service has been deployed! Check it out ${{ steps.deploy.outputs.url }} 
             (Note: since this service is gRPC service replace https:// with grpc:// and use gRPC client such as Postman to test it!)
+            (Important: you can fetch server reflection don't need to import proto file to your client!)
