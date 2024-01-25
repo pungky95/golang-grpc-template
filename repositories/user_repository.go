@@ -10,6 +10,7 @@ type UserRepositoryInterface interface {
 	Find(whereClause interface{}, whereNotClause interface{}, relations []string) ([]entities.User, error)
 	Save(*entities.User, *gorm.DB) error
 	Delete(entities.User, *gorm.DB) error
+	Create(entities.User, *gorm.DB) error
 }
 
 func NewUserRepository(db *gorm.DB) UserRepositoryInterface {
@@ -62,4 +63,11 @@ func (r UserRepository) Delete(user entities.User, tx *gorm.DB) error {
 		return tx.Delete(&user).Error
 	}
 	return r.db.Delete(&user).Error
+}
+
+func (r UserRepository) Create(user entities.User, tx *gorm.DB) error {
+	if tx != nil {
+		return tx.Create(&user).Error
+	}
+	return r.db.Create(&user).Error
 }
